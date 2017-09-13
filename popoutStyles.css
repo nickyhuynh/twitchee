@@ -1,0 +1,62 @@
+#twitchExtension {
+  width: 540px;
+  height: 320px;
+  position: fixed;
+  background-color: #17141f;
+  top: 5px;
+  right: 5px;
+  border-radius: 5px;
+  z-index: 1000;
+}
+
+#searchHeader {
+  height: 50px;
+  background-color: #4b367c;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+  display: flex;
+}
+
+#searchBar {
+  width: 200px;
+  height: 25px;
+  margin: auto;
+  background-color: #FFF;
+  opacity: 0.4;
+  align-items: center;
+}
+
+#contentWindow {
+  position: absolute;
+  max-height: 270px;
+  height: 270px;
+  left: 0;
+  min-width: 540px;
+  display: inline-block;
+  overflow-y: scroll;
+}
+
+.channel {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow-x: hidden;
+  max-width: 534px;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+   background-color: rgba(255,255,255,0.4);
+  -webkit-border-radius: 80px;
+}
+::-webkit-scrollbar:hover {
+  background-color: rgba(255, 255, 255, 0.09);
+}
+
+::-webkit-scrollbar-thumb:vertical {
+  background: rgba(0,0,0,0.61);
+  -webkit-border-radius: 80px;
+}
+::-webkit-scrollbar-thumb:vertical:active {
+  background: rgba(0,0,0,0.61);
+  -webkit-border-radius: 80px;
+}
