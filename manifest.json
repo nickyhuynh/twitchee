@@ -2,13 +2,17 @@
   "manifest_version": 2,
   "name": "Twitchy",
   "version": "0.1",
+  "permissions": [
+    "tabs",
+    "activeTab"
+    ],
   "content_scripts": [
     {
       "matches": [
         "<all_urls>"
       ],
       "css": ["popoutStyles.css"],
-      "js": ["jquery-3.2.1.min.js", "content.js"]
+      "js": ["jquery-3.2.1.min.js", "jquery-ui.min.js", "content.js"]
     }
   ],
   "browser_action": {

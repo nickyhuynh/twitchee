@@ -1,5 +1,28 @@
 var clientId = "3p02mzgz7bd8semst5y4s88u49ihr3";
 
+// chrome.windows.getLastFocused(
+//  // Without this, window.tabs is not populated.
+//  {populate: true},
+//  function (window)
+//  {
+//   var foundSelected = false;
+//   for (var i = 0; i < window.tabs.length; i++)
+//   {
+//    // Finding the selected tab.
+//    if (window.tabs[i].active)
+//    {
+//     foundSelected = true;
+//    }
+//    // Finding the next tab.
+//    else if (foundSelected)
+//    {
+//     // Selecting the next tab.
+//     chrome.tabs.update(window.tabs[i].id, {active: true});
+//     return;
+//    }
+//   }
+//  });
+
 chrome.runtime.onMessage.addListener(
   function(request, sender, sendResponse) {
     if( request.message === "clicked_browser_action" ) {
@@ -15,7 +38,7 @@ chrome.runtime.onMessage.addListener(
       } else {
         document.getElementById('twitchExtension').outerHTML = '';
       }
-    }
+  }
   }
 );
 
@@ -33,12 +56,17 @@ function createWindow() {
     twitchExtension = document.createElement('div');
 
     twitchExtension.id = 'twitchExtension';
+    twitchExtension.className = 'dragEnabled';
 
     twitchExtension.appendChild(header);
     twitchExtension.appendChild(contentWindow);
     twitchExtension.appendChild(loader);
 
     $(twitchExtension).appendTo('body');
+
+    $(function() {
+        $('.dragEnabled').draggable();
+    });
 }
 
 function rgbaTrans(r, g, b, a) {

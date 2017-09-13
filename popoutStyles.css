@@ -79,6 +79,12 @@ iframe {
   animation: spin 2s linear infinite;
 }
 
+/*.dragEnabled{
+    draggable: true;
+    -webkit-user-drag: element;
+    cursor: move;
+}*/
+
 @-webkit-keyframes spin {
   0% { -webkit-transform: rotate(0deg); }
   100% { -webkit-transform: rotate(360deg); }
