@@ -192,9 +192,14 @@ function loadChannels(evt) {
 
 function openStream(evt) {
   var twitchExtension = document.getElementById('twitchExtension');
+  var twitchStream = document.createElement('div');
   var streamOverlay = document.createElement('div');
   var backButton = document.createElement('div');
   var exitButton = document.createElement('div');
+
+  twitchStream.id = 'twitchStream';
+  twitchStream.style.position = 'absolute';
+  twitchStream.style.top = 0;
 
   backButton.style.backgroundImage = 'url(' + chrome.extension.getURL('back.png') + ')';
   backButton.id = 'backButton';
@@ -209,7 +214,9 @@ function openStream(evt) {
   backButton.data = evt.target.data;
   backButton.i = evt.target.index;
   backButton.segueFrom = 'stream';
-  backButton.addEventListener("click", loadChannels, false);
+  backButton.addEventListener("click", function() {
+      twitchStream.outerHTML = "";
+  }, false);
 
   exitButton.style.backgroundImage = 'url(' + chrome.extension.getURL('cancel.png') + ')';
   exitButton.id = 'exitButton';
@@ -225,12 +232,11 @@ function openStream(evt) {
       document.getElementById('twitchExtension').outerHTML = '';
   }, false);
 
-  twitchExtension.innerHTML = "";
-
   streamOverlay.id = 'streamOverlay';
   streamOverlay.appendChild(backButton);
   streamOverlay.appendChild(exitButton);
 
-  twitchExtension.innerHTML = '<iframe id="twitchPlayer" src="https://player.twitch.tv/?channel=' + evt.target.channelName +'&muted=true" height="320" width="540" frameborder="0" scrolling="no" allowfullscreen webkitallowfullscreen mozallowfullscreen> </iframe>'
-  twitchExtension.appendChild(streamOverlay);
+  twitchStream.innerHTML = '<iframe id="twitchPlayer" src="https://player.twitch.tv/?channel=' + evt.target.channelName +'&muted=true" height="320" width="540" frameborder="0" scrolling="no" allowfullscreen webkitallowfullscreen mozallowfullscreen> </iframe>'
+  twitchStream.appendChild(streamOverlay);
+  twitchExtension.appendChild(twitchStream);
 }
