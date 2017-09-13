@@ -36,6 +36,25 @@
   overflow-y: scroll;
 }
 
+#streamOverlay {
+    position: absolute;
+    height: 50px;
+    width: 540px;
+    opacity: 0;
+    left: 0;
+    top: 0;
+    right: 0;
+    background-color: rgba(255, 255, 255, 0.4);
+}
+
+#streamOverlay:hover {
+    opacity: 1;
+}
+
+iframe {
+    border-radius: 5px;
+}
+
 .channel {
   white-space: nowrap;
   text-overflow: ellipsis;

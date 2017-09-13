@@ -4,18 +4,7 @@ chrome.runtime.onMessage.addListener(
   function(request, sender, sendResponse) {
     if( request.message === "clicked_browser_action" ) {
       if(document.getElementById('twitchExtension') == null) {
-        var twitchExtension = document.createElement('div');
-        twitchExtension.id = 'twitchExtension';
-
-        var header = document.createElement('div');
-        header.id = 'header';
-        var contentWindow = document.createElement('div');
-        contentWindow.id = 'contentWindow';
-
-        twitchExtension.appendChild(header);
-        twitchExtension.appendChild(contentWindow);
-
-        $(twitchExtension).appendTo('body');
+        createWindow();
 
         setTimeout(function() {
           loadChannelsPage();
@@ -28,6 +17,29 @@ chrome.runtime.onMessage.addListener(
     }
   }
 );
+
+function createWindow() {
+    var header = document.createElement('div');
+    header.id = 'header';
+    var contentWindow = document.createElement('div');
+    contentWindow.id = 'contentWindow';
+
+    var twitchExtension = document.getElementById('twitchExtension');
+
+    if(twitchExtension == null) {
+        twitchExtension = document.createElement('div');
+
+        twitchExtension.id = 'twitchExtension';
+
+        twitchExtension.appendChild(header);
+        twitchExtension.appendChild(contentWindow);
+
+        $(twitchExtension).appendTo('body');
+    } else {
+        twitchExtension.appendChild(header);
+        twitchExtension.appendChild(contentWindow);
+    }
+}
 
 function rgbaTrans(r, g, b, a) {
   return 'rgba(' + [r, g, b, a].join(',') + ')';
@@ -58,6 +70,22 @@ function loadChannelsPage() {
   var searchBar = document.createElement('div');
   searchBar.id="searchBar";
 
+  var exitButton = document.createElement('div');
+  exitButton.style.backgroundImage = 'url(' + chrome.extension.getURL('cancel.png') + ')';
+  exitButton.id = 'exitButton';
+  exitButton.style.width = '15px';
+  exitButton.style.height = '15px';
+  exitButton.style.backgroundSize = '15px 15px';
+  exitButton.style.padding = '17.5px';
+  exitButton.style.position = 'absolute';
+  exitButton.style.backgroundRepeat = 'no-repeat';
+  exitButton.style.backgroundPosition = 'center';
+  exitButton.style.right = 0;
+  exitButton.addEventListener("click", function() {
+      document.getElementById('twitchExtension').outerHTML = '';
+  }, false);
+
+  searchHeader.appendChild(exitButton);
   searchHeader.appendChild(searchBar);
 
   var games = loadGames();
@@ -101,12 +129,24 @@ function loadGames() {
 function loadChannels(evt) {
   var searchHeader = document.getElementById('searchHeader');
 
+  if(evt.target.segueFrom == 'stream') {
+      var twitchExtension = document.getElementById('twitchExtension');
+      twitchExtension.innerHTML = "";
+      createWindow();
+      loadChannelsPage();
+      searchHeader = document.getElementById('searchHeader');
+  }
+
   var backButton = document.createElement('div');
   backButton.style.backgroundImage = 'url(' + chrome.extension.getURL('back.png') + ')';
   backButton.id = 'backButton';
-  backButton.position = 'relative';
-  backButton.style.width = '30px';
-  backButton.style.height = '30px';
+  backButton.style.width = '20px';
+  backButton.style.height = '20px';
+  backButton.style.backgroundSize = '20px 20px';
+  backButton.style.padding = '15px';
+  backButton.style.position = 'absolute';
+  backButton.style.backgroundRepeat = 'no-repeat';
+  backButton.style.backgroundPosition = 'center';
   backButton.style.float = 'left';
   backButton.addEventListener("click", loadChannelsPage, false);
 
@@ -137,6 +177,8 @@ function loadChannels(evt) {
         channel.style.paddingRight = '15px';
         channel.style.overflow = 'hidden';
 
+        channel.data = evt.target.data;
+        channel.index = evt.target.index;
         channel.channelName = channelData["channel"]["display_name"];
         channel.addEventListener("click", openStream, false);
 
@@ -150,7 +192,45 @@ function loadChannels(evt) {
 
 function openStream(evt) {
   var twitchExtension = document.getElementById('twitchExtension');
+  var streamOverlay = document.createElement('div');
+  var backButton = document.createElement('div');
+  var exitButton = document.createElement('div');
+
+  backButton.style.backgroundImage = 'url(' + chrome.extension.getURL('back.png') + ')';
+  backButton.id = 'backButton';
+  backButton.style.width = '20px';
+  backButton.style.height = '20px';
+  backButton.style.backgroundSize = '20px 20px';
+  backButton.style.padding = '15px';
+  backButton.style.position = 'absolute';
+  backButton.style.backgroundRepeat = 'no-repeat';
+  backButton.style.backgroundPosition = 'center';
+  backButton.style.float = 'left';
+  backButton.data = evt.target.data;
+  backButton.i = evt.target.index;
+  backButton.segueFrom = 'stream';
+  backButton.addEventListener("click", loadChannels, false);
+
+  exitButton.style.backgroundImage = 'url(' + chrome.extension.getURL('cancel.png') + ')';
+  exitButton.id = 'exitButton';
+  exitButton.style.width = '15px';
+  exitButton.style.height = '15px';
+  exitButton.style.backgroundSize = '15px 15px';
+  exitButton.style.padding = '17.5px';
+  exitButton.style.position = 'absolute';
+  exitButton.style.backgroundRepeat = 'no-repeat';
+  exitButton.style.backgroundPosition = 'center';
+  exitButton.style.right = 0;
+  exitButton.addEventListener("click", function() {
+      document.getElementById('twitchExtension').outerHTML = '';
+  }, false);
 
   twitchExtension.innerHTML = "";
+
+  streamOverlay.id = 'streamOverlay';
+  streamOverlay.appendChild(backButton);
+  streamOverlay.appendChild(exitButton);
+
   twitchExtension.innerHTML = '<iframe id="twitchPlayer" src="https://player.twitch.tv/?channel=' + evt.target.channelName +'&muted=true" height="320" width="540" frameborder="0" scrolling="no" allowfullscreen webkitallowfullscreen mozallowfullscreen> </iframe>'
+  twitchExtension.appendChild(streamOverlay);
 }

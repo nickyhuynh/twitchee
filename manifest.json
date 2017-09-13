@@ -17,5 +17,5 @@
   "background": {
     "scripts": ["background.js"]
   },
-  "web_accessible_resources": ["back.png"]
+  "web_accessible_resources": ["back.png", "cancel.png"]
 }
