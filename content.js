@@ -7,6 +7,7 @@ chrome.runtime.onMessage.addListener(
         createWindow();
 
         setTimeout(function() {
+
           loadChannelsPage();
           // var twitchPlayer = document.getElementById("twitchPlayer");
           // twitchPlayer.src = "https://player.twitch.tv/?channel=dreamhackcs&muted=true"
@@ -21,24 +22,23 @@ chrome.runtime.onMessage.addListener(
 function createWindow() {
     var header = document.createElement('div');
     header.id = 'header';
+
     var contentWindow = document.createElement('div');
     contentWindow.id = 'contentWindow';
 
+    var loader = document.createElement('div');
+    loader.id = 'loader';
+
     var twitchExtension = document.getElementById('twitchExtension');
+    twitchExtension = document.createElement('div');
 
-    if(twitchExtension == null) {
-        twitchExtension = document.createElement('div');
+    twitchExtension.id = 'twitchExtension';
 
-        twitchExtension.id = 'twitchExtension';
+    twitchExtension.appendChild(header);
+    twitchExtension.appendChild(contentWindow);
+    twitchExtension.appendChild(loader);
 
-        twitchExtension.appendChild(header);
-        twitchExtension.appendChild(contentWindow);
-
-        $(twitchExtension).appendTo('body');
-    } else {
-        twitchExtension.appendChild(header);
-        twitchExtension.appendChild(contentWindow);
-    }
+    $(twitchExtension).appendTo('body');
 }
 
 function rgbaTrans(r, g, b, a) {
@@ -121,12 +121,20 @@ function loadGames() {
 
       games.appendChild(game);
     }
+
+    var loader = document.getElementById('loader');
+
+    if(loader != null) {
+      loader.outerHTML = "";
+    }
   })
 
   return games;
 }
 
 function loadChannels(evt) {
+  var twitchExtension = document.getElementById('twitchExtension');
+
   var searchHeader = document.getElementById('searchHeader');
 
   if(evt.target.segueFrom == 'stream') {
@@ -136,6 +144,11 @@ function loadChannels(evt) {
       loadChannelsPage();
       searchHeader = document.getElementById('searchHeader');
   }
+
+  var loader = document.createElement('div');
+  loader.id = 'loader';
+
+  twitchExtension.appendChild(loader);
 
   var backButton = document.createElement('div');
   backButton.style.backgroundImage = 'url(' + chrome.extension.getURL('back.png') + ')';
@@ -148,7 +161,10 @@ function loadChannels(evt) {
   backButton.style.backgroundRepeat = 'no-repeat';
   backButton.style.backgroundPosition = 'center';
   backButton.style.float = 'left';
-  backButton.addEventListener("click", loadChannelsPage, false);
+  backButton.addEventListener("click", function() {
+      twitchExtension.appendChild(loader);
+      loadChannelsPage();
+  }, false);
 
   searchHeader.appendChild(backButton);
 
@@ -176,14 +192,13 @@ function loadChannels(evt) {
         channel.style.paddingLeft = '15px';
         channel.style.paddingRight = '15px';
         channel.style.overflow = 'hidden';
-
-        channel.data = evt.target.data;
-        channel.index = evt.target.index;
         channel.channelName = channelData["channel"]["display_name"];
         channel.addEventListener("click", openStream, false);
 
         contentWindow.appendChild(channel);
       }
+
+      loader.outerHTML = "";
     });
   } else {
     //means that i need to load some user saved data instead
@@ -196,6 +211,12 @@ function openStream(evt) {
   var streamOverlay = document.createElement('div');
   var backButton = document.createElement('div');
   var exitButton = document.createElement('div');
+  var loader = document.createElement('div');
+
+  loader.id = 'loader';
+  loader.style.top = '50%';
+
+  twitchExtension.appendChild(loader);
 
   twitchStream.id = 'twitchStream';
   twitchStream.style.position = 'absolute';
@@ -211,9 +232,6 @@ function openStream(evt) {
   backButton.style.backgroundRepeat = 'no-repeat';
   backButton.style.backgroundPosition = 'center';
   backButton.style.float = 'left';
-  backButton.data = evt.target.data;
-  backButton.i = evt.target.index;
-  backButton.segueFrom = 'stream';
   backButton.addEventListener("click", function() {
       twitchStream.outerHTML = "";
   }, false);
@@ -239,4 +257,9 @@ function openStream(evt) {
   twitchStream.innerHTML = '<iframe id="twitchPlayer" src="https://player.twitch.tv/?channel=' + evt.target.channelName +'&muted=true" height="320" width="540" frameborder="0" scrolling="no" allowfullscreen webkitallowfullscreen mozallowfullscreen> </iframe>'
   twitchStream.appendChild(streamOverlay);
   twitchExtension.appendChild(twitchStream);
+
+  document.getElementById('twitchPlayer').onload = function() {
+      loader.outerHTML = "";
+    //   alert(document.getElementById('twitchPlayer').readyState);
+  }
 }
