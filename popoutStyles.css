@@ -1,3 +1,7 @@
+input {
+  autocomplete: "on";
+}
+
 #twitchExtension {
   width: 540px;
   height: 320px;
@@ -7,6 +11,28 @@
   right: 5px;
   border-radius: 5px;
   z-index: 1000;
+}
+
+.twitchNaviButton {
+  width: 20px;
+  height: 20px;
+  background-size: 20px 20px;
+  padding: 15px;
+  position: absolute;
+  background-repeat: no-repeat;
+  background-position: center;
+  float: left;
+}
+
+#twitchExitButton {
+  width: 15px;
+  height: 15px;
+  background-size: 15px 15px;
+  padding: 17.5px;
+  position: absolute;
+  background-repeat: no-repeat;
+  background-position: center;
+  right: 0;
 }
 
 #searchHeader {
@@ -26,6 +52,33 @@
   align-items: center;
 }
 
+.ui-autocomplete {
+  position:absolute;
+  z-index: 1001;
+}
+
+.ui-widget.ui-widget-content {
+  border: 1px solid #c5c5c5;
+  background: #ababab;
+  color: #333333;
+}
+
+.ui-menu {
+	list-style: none;
+	padding: 3px;
+	margin: 0;
+	display: block;
+	outline: 0;
+}
+
+.ui-menu-item {
+  cursor: pointer;
+  height: 25px;
+  align-items: center;
+  text-align:center;
+  line-height: 25px;
+}
+
 #contentWindow {
   position: absolute;
   max-height: 270px;
@@ -36,6 +89,23 @@
   overflow-y: scroll;
 }
 
+.channel {
+  background-color: rgba(255, 255, 255, 0.4);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.3);
+  height: 30px;
+  width: 504px;
+  color: rgba(0, 0, 0, 0.7);
+  line-height: 30px;
+  text-align: left;
+  padding-left: 15px;
+  padding-right: 15px;
+  overflow: 'hidden';
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow-x: hidden;
+  max-width: 534px;
+}
+
 #streamOverlay {
     position: absolute;
     height: 50px;
@@ -44,18 +114,11 @@
     left: 0;
     top: 0;
     right: 0;
-    background-color: rgba(255, 255, 255, 0.4);
+    background-color: rgba(0, 0, 0, 0.8);
 }
 
 #streamOverlay:hover {
     opacity: 1;
-}
-
-.channel {
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  overflow-x: hidden;
-  max-width: 534px;
 }
 
 iframe {

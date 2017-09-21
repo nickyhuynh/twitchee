@@ -1,27 +1,5 @@
 var clientId = "3p02mzgz7bd8semst5y4s88u49ihr3";
-
-// chrome.windows.getLastFocused(
-//  // Without this, window.tabs is not populated.
-//  {populate: true},
-//  function (window)
-//  {
-//   var foundSelected = false;
-//   for (var i = 0; i < window.tabs.length; i++)
-//   {
-//    // Finding the selected tab.
-//    if (window.tabs[i].active)
-//    {
-//     foundSelected = true;
-//    }
-//    // Finding the next tab.
-//    else if (foundSelected)
-//    {
-//     // Selecting the next tab.
-//     chrome.tabs.update(window.tabs[i].id, {active: true});
-//     return;
-//    }
-//   }
-//  });
+var pendingAction;
 
 chrome.runtime.onMessage.addListener(
   function(request, sender, sendResponse) {
@@ -38,7 +16,9 @@ chrome.runtime.onMessage.addListener(
       } else {
         document.getElementById('twitchExtension').outerHTML = '';
       }
-  }
+    } else if ( request.message === "tabs_browser_switched") {
+      console.log("asdfsadfasdf");
+    }
   }
 );
 
@@ -95,24 +75,53 @@ function loadChannelsPage() {
   var searchHeader = document.createElement('div');
   searchHeader.id="searchHeader";
 
-  var searchBar = document.createElement('div');
+  var searchBar = document.createElement('input');
+  searchBar.setAttribute("type", "search");
+  searchBar.setAttribute("autocomplete", "on");
   searchBar.id="searchBar";
+
+  /*
+  code for executing on autocomplete search
+  */
+
+  searchBar.addEventListener('input', function() {
+    var url = "https://api.twitch.tv/kraken/search/channels?limit=5&query=" + searchBar.value + "&client_id=" + clientId;
+
+    if(pendingAction != null) {
+      clearTimeout(pendingAction);
+    }
+
+    pendingAction = setTimeout(function() {
+      getJSON(url, function(err, data) {
+        console.log(data["channels"].map(function(chan) {return chan["name"]}));
+         $("#searchBar").autocomplete({
+          source: data["channels"].map(function(chan) {return chan["name"]})
+        });
+
+        $("#searchBar").attr("autocomplete", "on");
+      });
+    }, 400);
+  });
+
+  var favoriteButton = document.createElement('div');
+  favoriteButton.style.backgroundImage = 'url(' + chrome.extension.getURL('heart.png') + ')';
+  favoriteButton.id = 'favoriteButtonHome';
+  favoriteButton.className = 'twitchNaviButton';
+  chrome.storage.sync.get('favoriteChannels', function(data) {
+    favoriteButton.channels = data;
+    console.log(data);
+  });
+  favoriteButton.segueFrom = 'favoriteButtonClick';
+  favoriteButton.addEventListener("click", loadChannels, false);
 
   var exitButton = document.createElement('div');
   exitButton.style.backgroundImage = 'url(' + chrome.extension.getURL('cancel.png') + ')';
-  exitButton.id = 'exitButton';
-  exitButton.style.width = '15px';
-  exitButton.style.height = '15px';
-  exitButton.style.backgroundSize = '15px 15px';
-  exitButton.style.padding = '17.5px';
-  exitButton.style.position = 'absolute';
-  exitButton.style.backgroundRepeat = 'no-repeat';
-  exitButton.style.backgroundPosition = 'center';
-  exitButton.style.right = 0;
+  exitButton.id = 'twitchExitButton';
   exitButton.addEventListener("click", function() {
       document.getElementById('twitchExtension').outerHTML = '';
   }, false);
 
+  searchHeader.appendChild(favoriteButton);
   searchHeader.appendChild(exitButton);
   searchHeader.appendChild(searchBar);
 
@@ -121,6 +130,7 @@ function loadChannelsPage() {
   header.innerHTML = "";
   contentWindow.innerHTML = "";
   header.appendChild(searchHeader);
+
   contentWindow.appendChild(games);
 }
 
@@ -161,6 +171,8 @@ function loadGames() {
 }
 
 function loadChannels(evt) {
+  document.getElementById('favoriteButtonHome').style.left = '50px';
+
   var twitchExtension = document.getElementById('twitchExtension');
 
   var searchHeader = document.getElementById('searchHeader');
@@ -181,14 +193,7 @@ function loadChannels(evt) {
   var backButton = document.createElement('div');
   backButton.style.backgroundImage = 'url(' + chrome.extension.getURL('back.png') + ')';
   backButton.id = 'backButton';
-  backButton.style.width = '20px';
-  backButton.style.height = '20px';
-  backButton.style.backgroundSize = '20px 20px';
-  backButton.style.padding = '15px';
-  backButton.style.position = 'absolute';
-  backButton.style.backgroundRepeat = 'no-repeat';
-  backButton.style.backgroundPosition = 'center';
-  backButton.style.float = 'left';
+  backButton.className = 'twitchNaviButton';
   backButton.addEventListener("click", function() {
       twitchExtension.appendChild(loader);
       loadChannelsPage();
@@ -196,9 +201,12 @@ function loadChannels(evt) {
 
   searchHeader.appendChild(backButton);
 
-  if(evt.channels == null) {
+  console.log(evt.target.channels);
+
+  if(evt.target.channels == null) {
     var gameName = evt.target.data["top"][evt.target.index]["game"]["name"];
     var url = "https://api.twitch.tv/kraken/streams?limit=20&game=" + gameName + "&client_id=" + clientId;
+
     getJSON(url, function(err, data) {
       var contentWindow = document.getElementById("contentWindow");
       contentWindow.innerHTML = "";
@@ -209,18 +217,7 @@ function loadChannels(evt) {
         var channel = document.createElement('div');
         var channelData = data["streams"][i];
         channel.className = 'channel';
-        channel.style.backgroundColor = 'rgba(' + [bgc[0],bgc[1],bgc[2],0.4].join(',') + ')';
-        channel.style.borderBottom = '1px solid rgba(' + [0, 0, 0, 0.3].join(',') + ')';
-        channel.style.height = '30px';
-        channel.style.width = '504px';
         channel.textContent = channelData["viewers"] + " viewers / " + channelData["channel"]["display_name"] + " / " + channelData["channel"]["status"];
-        channel.style.color = rgbaTrans(0, 0, 0, 0.7);
-        channel.style.lineHeight = '30px';
-        channel.style.textAlign = 'left';
-        channel.style.paddingLeft = '15px';
-        channel.style.paddingRight = '15px';
-        channel.style.overflow = 'hidden';
-        channel.channelName = channelData["channel"]["display_name"];
         channel.addEventListener("click", openStream, false);
 
         contentWindow.appendChild(channel);
@@ -230,6 +227,24 @@ function loadChannels(evt) {
     });
   } else {
     //means that i need to load some user saved data instead
+    var contentWindow = document.getElementById("contentWindow");
+    contentWindow.innerHTML = "";
+
+    var bgc = [255, 255, 255];
+
+    for(var i = 0; i < evt.target.channels.length; i++) {
+      var channel = document.createElement('div');
+      var channelData =  evt.target.channels[i];
+      channel.className = 'channel';
+      channel.textContent = channelData["viewers"] + " viewers / " + channelData["channel"]["display_name"] + " / " + channelData["channel"]["status"];
+      channel.channelName = channelData["channel"]["display_name"];
+      channel.channelData = channelData;
+      channel.addEventListener("click", openStream, false);
+
+      contentWindow.appendChild(channel);
+    }
+
+    loader.outerHTML = "";
   }
 }
 
@@ -238,6 +253,8 @@ function openStream(evt) {
   var twitchStream = document.createElement('div');
   var streamOverlay = document.createElement('div');
   var backButton = document.createElement('div');
+  var homeButton = document.createElement('div');
+  var favoriteButton = document.createElement('div');
   var exitButton = document.createElement('div');
   var loader = document.createElement('div');
 
@@ -250,16 +267,41 @@ function openStream(evt) {
   twitchStream.style.position = 'absolute';
   twitchStream.style.top = 0;
 
+  homeButton.style.backgroundImage = 'url(' + chrome.extension.getURL('home.png') + ')';
+  homeButton.id = 'homeButton';
+  homeButton.className = 'twitchNaviButton';
+  homeButton.style.left = '50px';
+  homeButton.addEventListener("click", function() {
+      // twitchExtension.innerHTML = "";
+      twitchStream.outerHTML = "";
+      document.getElementById('header').innerHTML = "";
+      // createWindow();
+
+      setTimeout(function() {
+
+        loadChannelsPage();
+        // var twitchPlayer = document.getElementById("twitchPlayer");
+        // twitchPlayer.src = "https://player.twitch.tv/?channel=dreamhackcs&muted=true"
+      }, 15);
+  }, false);
+
+  favoriteButton.style.backgroundImage = 'url(' + chrome.extension.getURL('heart.png') + ')';
+  favoriteButton.id = 'favoriteButton';
+  favoriteButton.style.left = '100px';
+  favoriteButton.className = 'twitchNaviButton';
+  favoriteButton.addEventListener("click", function(evt) {
+    chrome.storage.sync.get("favoriteChannels", function(data) {
+      chrome.storage.sync.set({'favoriteChannels': [data].push(evt.target.channelData)}, function() {
+            // Notify that we saved.
+            // message(evt.target.channelData);
+            console.log();
+          });
+    });
+  }, false);
+
   backButton.style.backgroundImage = 'url(' + chrome.extension.getURL('back.png') + ')';
   backButton.id = 'backButton';
-  backButton.style.width = '20px';
-  backButton.style.height = '20px';
-  backButton.style.backgroundSize = '20px 20px';
-  backButton.style.padding = '15px';
-  backButton.style.position = 'absolute';
-  backButton.style.backgroundRepeat = 'no-repeat';
-  backButton.style.backgroundPosition = 'center';
-  backButton.style.float = 'left';
+  backButton.className = 'twitchNaviButton';
   backButton.addEventListener("click", function() {
       twitchStream.outerHTML = "";
   }, false);
@@ -280,6 +322,8 @@ function openStream(evt) {
 
   streamOverlay.id = 'streamOverlay';
   streamOverlay.appendChild(backButton);
+  streamOverlay.appendChild(homeButton);
+  streamOverlay.appendChild(favoriteButton);
   streamOverlay.appendChild(exitButton);
 
   twitchStream.innerHTML = '<iframe id="twitchPlayer" src="https://player.twitch.tv/?channel=' + evt.target.channelName +'&muted=true" height="320" width="540" frameborder="0" scrolling="no" allowfullscreen webkitallowfullscreen mozallowfullscreen> </iframe>'
