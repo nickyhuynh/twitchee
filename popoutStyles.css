@@ -89,6 +89,10 @@ input {
   overflow-y: scroll;
 }
 
+.game {
+    cursor: pointer;
+}
+
 .channel {
   background-color: rgba(255, 255, 255, 0.4);
   border-bottom: 1px solid rgba(0, 0, 0, 0.3);
@@ -104,6 +108,7 @@ input {
   text-overflow: ellipsis;
   overflow-x: hidden;
   max-width: 534px;
+  cursor: pointer;
 }
 
 #streamOverlay {

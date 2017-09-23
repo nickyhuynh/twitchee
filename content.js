@@ -49,6 +49,29 @@ function createWindow() {
     });
 }
 
+function contains(a, obj) {
+    for (var i = 0; i < a.length; i++) {
+        if (a[i]["_id"] === obj["_id"]) {
+            // console.log("a", a);
+            // console.log("obj", obj);
+            return true;
+        }
+    }
+    return false;
+}
+
+function remove(a, obj) {
+    for (var i = 0; i < a.length; i++) {
+        if (a[i]["_id"] === obj["_id"]) {
+            // console.log("ra", a);
+            // console.log("robj", obj);
+            a.splice(i, 1);
+            return;
+        }
+    }
+    return;
+}
+
 function rgbaTrans(r, g, b, a) {
   return 'rgba(' + [r, g, b, a].join(',') + ')';
 }
@@ -93,7 +116,7 @@ function loadChannelsPage() {
 
     pendingAction = setTimeout(function() {
       getJSON(url, function(err, data) {
-        console.log(data["channels"].map(function(chan) {return chan["name"]}));
+        // console.log(data["channels"].map(function(chan) {return chan["name"]}));
          $("#searchBar").autocomplete({
           source: data["channels"].map(function(chan) {return chan["name"]})
         });
@@ -109,7 +132,7 @@ function loadChannelsPage() {
   favoriteButton.className = 'twitchNaviButton';
   chrome.storage.sync.get('favoriteChannels', function(data) {
     favoriteButton.channels = data;
-    console.log(data);
+    // console.log(data);
   });
   favoriteButton.segueFrom = 'favoriteButtonClick';
   favoriteButton.addEventListener("click", loadChannels, false);
@@ -201,7 +224,7 @@ function loadChannels(evt) {
 
   searchHeader.appendChild(backButton);
 
-  console.log(evt.target.channels);
+  // console.log(evt.target.channels);
 
   if(evt.target.channels == null) {
     var gameName = evt.target.data["top"][evt.target.index]["game"]["name"];
@@ -218,8 +241,9 @@ function loadChannels(evt) {
         var channelData = data["streams"][i];
         channel.className = 'channel';
         channel.textContent = channelData["viewers"] + " viewers / " + channelData["channel"]["display_name"] + " / " + channelData["channel"]["status"];
+        channel.channelName = channelData["channel"]["display_name"];
+        channel.channelData = channelData;
         channel.addEventListener("click", openStream, false);
-
         contentWindow.appendChild(channel);
       }
 
@@ -249,6 +273,7 @@ function loadChannels(evt) {
 }
 
 function openStream(evt) {
+
   var twitchExtension = document.getElementById('twitchExtension');
   var twitchStream = document.createElement('div');
   var streamOverlay = document.createElement('div');
@@ -289,15 +314,8 @@ function openStream(evt) {
   favoriteButton.id = 'favoriteButton';
   favoriteButton.style.left = '100px';
   favoriteButton.className = 'twitchNaviButton';
-  favoriteButton.addEventListener("click", function(evt) {
-    chrome.storage.sync.get("favoriteChannels", function(data) {
-      chrome.storage.sync.set({'favoriteChannels': [data].push(evt.target.channelData)}, function() {
-            // Notify that we saved.
-            // message(evt.target.channelData);
-            console.log();
-          });
-    });
-  }, false);
+  favoriteButton.channelData = evt.target.channelData;
+  favoriteButton.addEventListener("click", addFavorite, false);
 
   backButton.style.backgroundImage = 'url(' + chrome.extension.getURL('back.png') + ')';
   backButton.id = 'backButton';
@@ -334,4 +352,29 @@ function openStream(evt) {
       loader.outerHTML = "";
     //   alert(document.getElementById('twitchPlayer').readyState);
   }
+}
+
+function addFavorite(evt) {
+    // console.log(evt.target.channelData);
+    chrome.storage.local.get({favoriteChannels: []}, function(result) {
+        var favoriteChannels = result.favoriteChannels;
+
+        console.log(favoriteChannels);
+
+        if(!contains(favoriteChannels, evt.target.channelData)) {
+            favoriteChannels.push(evt.target.channelData);
+
+            chrome.storage.local.set({favoriteChannels: favoriteChannels}, function(result) {
+            });
+        } else {
+            remove(favoriteChannels, evt.target.channelData);
+
+            chrome.storage.local.set({favoriteChannels: favoriteChannels}, function(result) {
+                //when deleted unighlight heart
+            });
+        }
+
+        // console.log("channelData", evt.target.channelData);
+        // console.log("favoriteChannels", favoriteChannels);
+    });
 }
