@@ -2,7 +2,7 @@ input {
   autocomplete: "on";
 }
 
-#twitchExtension {
+#twitcheeExtension {
   width: 540px;
   height: 320px;
   position: fixed;
@@ -13,7 +13,7 @@ input {
   z-index: 1000;
 }
 
-.twitchNaviButton {
+.twitcheeNaviButton {
   width: 20px;
   height: 20px;
   background-size: 20px 20px;
@@ -24,7 +24,7 @@ input {
   float: left;
 }
 
-#twitchExitButton {
+#twitcheeExitButton {
   width: 15px;
   height: 15px;
   background-size: 15px 15px;
@@ -35,7 +35,7 @@ input {
   right: 0;
 }
 
-#searchHeader {
+#twitcheeSearchHeader {
   height: 50px;
   background-color: #4b367c;
   border-top-left-radius: 5px;
@@ -43,7 +43,7 @@ input {
   display: flex;
 }
 
-#searchBar {
+#twitcheeSearchBar {
   width: 200px;
   height: 25px;
   margin: auto;
@@ -51,6 +51,85 @@ input {
   opacity: 0.4;
   align-items: center;
 }
+
+#twitcheeContentWindow {
+  position: absolute;
+  max-height: 270px;
+  height: 270px;
+  left: 0;
+  min-width: 540px;
+  display: inline-block;
+  overflow-y: scroll;
+}
+
+.twitcheeGame {
+    cursor: pointer;
+    width: 136px;
+    height: 190px;
+    margin-left: 33px;
+    margin-top: 33px;
+    float: left;
+}
+
+.twitcheeChannel {
+  background-color: rgba(255, 255, 255, 0.4);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.3);
+  height: 30px;
+  width: 504px;
+  color: rgba(0, 0, 0, 0.7);
+  line-height: 30px;
+  text-align: left;
+  padding-left: 15px;
+  padding-right: 15px;
+  overflow: 'hidden';
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow-x: hidden;
+  max-width: 534px;
+  cursor: pointer;
+}
+
+#twitcheeStreamOverlay {
+    position: absolute;
+    height: 50px;
+    width: 540px;
+    opacity: 0;
+    left: 0;
+    top: 0;
+    right: 0;
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+#twitcheeStreamOverlay:hover {
+    opacity: 1;
+}
+
+iframe {
+    border-radius: 5px;
+}
+
+#twitcheeLoader {
+  position: absolute;
+  left: 50%;
+  top: 55%;
+  z-index: 1;
+  width: 21px;
+  height: 21px;
+  margin: -13.5px 0 0 -13.5px;
+  border: 3px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 3px solid #4b367c;
+  width: 21px;
+  height: 21px;
+  -webkit-animation: spin 2s linear infinite;
+  animation: spin 2s linear infinite;
+}
+
+/*.dragEnabled{
+    draggable: true;
+    -webkit-user-drag: element;
+    cursor: move;
+}*/
 
 .ui-autocomplete {
   position:absolute;
@@ -78,80 +157,6 @@ input {
   text-align:center;
   line-height: 25px;
 }
-
-#contentWindow {
-  position: absolute;
-  max-height: 270px;
-  height: 270px;
-  left: 0;
-  min-width: 540px;
-  display: inline-block;
-  overflow-y: scroll;
-}
-
-.game {
-    cursor: pointer;
-}
-
-.channel {
-  background-color: rgba(255, 255, 255, 0.4);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.3);
-  height: 30px;
-  width: 504px;
-  color: rgba(0, 0, 0, 0.7);
-  line-height: 30px;
-  text-align: left;
-  padding-left: 15px;
-  padding-right: 15px;
-  overflow: 'hidden';
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  overflow-x: hidden;
-  max-width: 534px;
-  cursor: pointer;
-}
-
-#streamOverlay {
-    position: absolute;
-    height: 50px;
-    width: 540px;
-    opacity: 0;
-    left: 0;
-    top: 0;
-    right: 0;
-    background-color: rgba(0, 0, 0, 0.8);
-}
-
-#streamOverlay:hover {
-    opacity: 1;
-}
-
-iframe {
-    border-radius: 5px;
-}
-
-#loader {
-  position: absolute;
-  left: 50%;
-  top: 55%;
-  z-index: 1;
-  width: 21px;
-  height: 21px;
-  margin: -13.5px 0 0 -13.5px;
-  border: 3px solid #f3f3f3;
-  border-radius: 50%;
-  border-top: 3px solid #4b367c;
-  width: 21px;
-  height: 21px;
-  -webkit-animation: spin 2s linear infinite;
-  animation: spin 2s linear infinite;
-}
-
-/*.dragEnabled{
-    draggable: true;
-    -webkit-user-drag: element;
-    cursor: move;
-}*/
 
 @-webkit-keyframes spin {
   0% { -webkit-transform: rotate(0deg); }
