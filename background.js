@@ -37,6 +37,14 @@
 //     "blocking"
 // ]);
 
+function doStuffWithDom(domContent) {
+    alert(domContent);
+}
+
+chrome.tabs.onActivated.addListener(function(activeInfo) {
+    // chrome.tabs.sendMessage(activeInfo.tabId, {"message": "report_back"}, doStuffWithDom);
+});
+
 // Called when the user clicks on the browser action.
 chrome.browserAction.onClicked.addListener(function(tab) {
   // Send a message to the active tab

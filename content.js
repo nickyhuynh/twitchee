@@ -16,7 +16,9 @@ chrome.runtime.onMessage.addListener(
       } else {
         document.getElementById('twitcheeExtension').outerHTML = '';
       }
-    } else if ( request.message === "tabs_browser_switched") {
+  } else if (request.message === "report_back") {
+    sendResponse(document.getElementById('twitcheeExtension').outerHTML);
+  } else if ( request.message === "tabs_browser_switched") {
       console.log("asdfsadfasdf");
     }
   }
@@ -190,10 +192,8 @@ function loadGames() {
 function returnChannelsPage(evt) {
   var twitchExtension = document.getElementById('twitcheeExtension');
 
-  var loader = document.createElement('div');
-  loader.id = 'twitcheeLoader';
 
-  twitchExtension.appendChild(loader);
+  twitchExtension.appendChild(evt.target.loader);
   loadChannelsPage();
 }
 
@@ -233,9 +233,7 @@ function loadChannels(evt) {
     document.getElementById('twitcheeFavoriteButtonHome').style.visibility = 'visible';
     var backButton = document.getElementById('twitcheeBackButton');
 
-    backButton.removeEventListener("click", loadChannels, false);
-
-    backButton.loader = document.getElementById('twitcheeLoader');
+    backButton.loader = document.getElementById('twitcheeoader');
     backButton.addEventListener("click", returnChannelsPage, false);
   }
 
@@ -287,11 +285,20 @@ function loadChannels(evt) {
         console.log("asdfasdf");
         var backButton = document.getElementById('twitcheeBackButton');
         backButton.removeEventListener("click", returnChannelsPage, false);
+        // returnChannelsPage();
         console.log(evt.target.data);
+        // var newBack = backButton.cloneNode(true);
+        // backButton.parentNode.replaceChild(newBack, backButton);
+        // // backButton.removeEventListener();
         backButton.index = evt.target.index;
         backButton.data = evt.target.data;
         // console.log(backButton);
         backButton.addEventListener("click", loadChannels, false);
+        //
+        // backButton.addEventListener("click", function() {
+        //     twitchExtension.appendChild(loader);
+        //     loadChannelsPage();
+        // }, false);
     }
     document.getElementById('twitcheeFavoriteButtonHome').style.visibility = 'collapse';
     loader.outerHTML = "";
