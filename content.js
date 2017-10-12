@@ -191,9 +191,10 @@ function loadGames() {
 
 function returnChannelsPage(evt) {
   var twitchExtension = document.getElementById('twitcheeExtension');
+  var loader = document.createElement('div');
+  loader.id = 'twitcheeLoader';
 
-
-  twitchExtension.appendChild(evt.target.loader);
+  twitchExtension.appendChild(loader);
   loadChannelsPage();
 }
 
@@ -225,7 +226,7 @@ function loadChannels(evt) {
 
     //   backButton.loader = loader;
       backButton.addEventListener("click", returnChannelsPage, false);
-
+      console.log("asdfasdf");
       searchHeader.appendChild(backButton);
   }
 
