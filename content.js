@@ -18,6 +18,7 @@ chrome.runtime.onMessage.addListener(
       }
   } else if (request.message === "report_back") {
     sendResponse(document.getElementById('twitcheeExtension').outerHTML);
+    // sendResponse("hello");
   } else if ( request.message === "tabs_browser_switched") {
       console.log("asdfsadfasdf");
     }
@@ -156,6 +157,8 @@ function loadChannelsPage() {
   contentWindow.innerHTML = "";
   header.appendChild(searchHeader);
 
+  console.log("zxcvzxv");
+
   contentWindow.appendChild(games);
 }
 
@@ -194,6 +197,9 @@ function returnChannelsPage(evt) {
   var loader = document.createElement('div');
   loader.id = 'twitcheeLoader';
 
+  // backButton.removeEventListener("click", loadChannelsPage, false);
+  // backButton.removeEventListener("click", returnChannelsPage, false);
+
   twitchExtension.appendChild(loader);
   loadChannelsPage();
 }
@@ -225,6 +231,7 @@ function loadChannels(evt) {
       backButton.className = 'twitcheeNaviButton';
 
     //   backButton.loader = loader;
+        console.log("1");
       backButton.addEventListener("click", returnChannelsPage, false);
       console.log("asdfasdf");
       searchHeader.appendChild(backButton);
@@ -233,8 +240,8 @@ function loadChannels(evt) {
   if(document.getElementById('twitcheeFavoriteButtonHome').style.visibility == 'collapse') {
     document.getElementById('twitcheeFavoriteButtonHome').style.visibility = 'visible';
     var backButton = document.getElementById('twitcheeBackButton');
+    backButton.removeEventListener("click", loadChannels, false);
 
-    backButton.loader = document.getElementById('twitcheeoader');
     backButton.addEventListener("click", returnChannelsPage, false);
   }
 

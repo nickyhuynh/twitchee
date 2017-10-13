@@ -38,11 +38,13 @@
 // ]);
 
 function doStuffWithDom(domContent) {
-    alert(domContent);
+    if(domContent) {
+        alert(domContent);
+    }
 }
 
 chrome.tabs.onActivated.addListener(function(activeInfo) {
-    // chrome.tabs.sendMessage(activeInfo.tabId, {"message": "report_back"}, doStuffWithDom);
+    chrome.tabs.sendMessage(activeInfo.tabId, {"message": "report_back"}, doStuffWithDom);
 });
 
 // Called when the user clicks on the browser action.
